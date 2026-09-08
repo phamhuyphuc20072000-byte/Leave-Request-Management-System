@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Đơn Xin Nghỉ Phép - Enterprise Prototype</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #131b2e;
+            --bg-card-hover: #1b2640;
+            --border-color: #23314e;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --primary-dark: #0284c7;
+            --success: #22c55e;
+            --success-bg: rgba(34, 197, 94, 0.12);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.12);
+            --danger: #ef4444;
+            --danger-bg: rgba(239, 68, 68, 0.12);
+            --purple: #a855f7;
+            --purple-bg: rgba(168, 85, 247, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-full: 9999px;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Bar */
+        header {
+            background: rgba(19, 27, 46, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .brand-badge {
+            background: var(--purple-bg);
+            color: var(--purple);
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Role Switcher Toolbar */
+        .role-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(11, 15, 25, 0.85);
+            border: 1px solid var(--border-color);
+            padding: 4px;
+            border-radius: var(--radius-full);
+            gap: 4px;
+        }
+
+        .role-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .role-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .role-btn.active {
+            background: var(--primary);
+            color: #0b0f19;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+            border: 2px solid var(--border-color);
+        }
+
+        /* Main Container */
+        .app-container {
+            display: flex;
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            gap: 2rem;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: 270px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--primary);
+            border-color: rgba(56, 189, 248, 0.25);
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Content Area */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Stats Card Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+        }
+
+        .stat-card.c-blue::before { background: var(--primary); }
+        .stat-card.c-green::before { background: var(--success); }
+        .stat-card.c-amber::before { background: var(--warning); }
+        .stat-card.c-purple::before { background: var(--purple); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Views (Pages) */
+        .view-section {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Filter Controls Toolbar */
+        .filter-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.45rem 0.75rem;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+            width: 180px;
+        }
+
+        /* Form Components */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group.col-span-2 {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        label span.req {
+            color: var(--danger);
+        }
+
+        input, select, textarea {
+            background: rgba(11, 15, 25, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.65rem 0.9rem;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Interactive Multi-Tier Rule Banner */
+        .rule-banner {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(56, 189, 248, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .rule-banner-icon {
+            color: var(--purple);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .rule-banner-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .rule-banner-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* File Upload Dropzone */
+        .dropzone {
+            border: 2px dashed var(--border-color);
+            background: rgba(11, 15, 25, 0.4);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .dropzone:hover {
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: #0b0f19;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: #253354;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: #0b0f19;
+            font-weight: 700;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            font-weight: 700;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            background: rgba(11, 15, 25, 0.7);
+            color: var(--text-secondary);
+            font-weight: 700;
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Highlight animation for updated/new rows */
+        .row-highlight {
+            animation: highlightGlow 3s ease-out;
+        }
+
+        @keyframes highlightGlow {
+            0% { background: rgba(56, 189, 248, 0.2); }
+            100% { background: transparent; }
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-pending {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-approved {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .badge-rejected {
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-hr {
+            background: var(--purple-bg);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .badge-draft {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        .badge-cancelled {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            padding: 1.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            animation: modalScale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.92); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Toast Alert */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.info { border-left: 4px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">
+                <i data-lucide="calendar-check-2"></i>
+            </div>
+            <div>
+                LeaveFlow <span class="brand-badge">Enterprise BA</span>
+            </div>
+        </div>
+
+        <!-- Role Simulator Toolbar -->
+        <div class="role-bar">
+            <span style="font-size: 0.78rem; color: var(--text-muted); padding-left: 10px;">Chuyển vai thử nghiệm:</span>
+            <button class="role-btn active" id="btnRoleEmp" onclick="switchRole('employee')">
+                <i data-lucide="user" style="width: 14px;"></i> 1. Nhân viên (Requester)
+            </button>
+            <button class="role-btn" id="btnRoleMgr" onclick="switchRole('manager')">
+                <i data-lucide="shield-check" style="width: 14px;"></i> 2. Trưởng phòng (Manager)
+            </button>
+            <button class="role-btn" id="btnRoleHR" onclick="switchRole('hr')">
+                <i data-lucide="briefcase" style="width: 14px;"></i> 3. HR Admin (HR Core)
+            </button>
+        </div>
+
+        <div class="user-info">
+            <div class="user-avatar" id="currentAvatar">NV</div>
+            <div>
+                <div style="font-size: 0.88rem; font-weight: 700;" id="currentUserName">Nguyễn Văn An</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);" id="currentUserRole">Phòng Kỹ thuật - IT</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Body -->
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside>
+            <div class="nav-item active" id="navDashboard" onclick="showView('dashboard')">
+                <i data-lucide="layout-dashboard" style="width: 18px;"></i>
+                <span>Bảng điều khiển</span>
+            </div>
+            <div class="nav-item" id="navCreateLeave" onclick="showView('create-leave')">
+                <i data-lucide="file-plus-2" style="width: 18px;"></i>
+                <span>Tạo đơn xin nghỉ (UC 1)</span>
+            </div>
+            <div class="nav-item" id="navMyLeaves" onclick="showView('my-leaves')">
+                <i data-lucide="list-checks" style="width: 18px;"></i>
+                <span>Lịch sử đơn của tôi</span>
+            </div>
+            <div class="nav-item" id="navApprovals" onclick="showView('approvals')">
+                <i data-lucide="stamp" style="width: 18px;"></i>
+                <span>Duyệt đơn nghỉ phép (UC 2)</span>
+                <span class="nav-badge" id="pendingCount">0</span>
+            </div>
+            <div class="nav-item" id="navHRConfig" onclick="showView('hr-config')">
+                <i data-lucide="sliders" style="width: 18px;"></i>
+                <span>Cấu hình Luồng & Quỹ phép</span>
+            </div>
+            <div class="nav-item" id="navAuditLogs" onclick="showView('audit-logs')">
+                <i data-lucide="history" style="width: 18px;"></i>
+                <span>Nhật ký Audit Trail</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <!-- ==================== VIEW 1: DASHBOARD ==================== -->
+            <div id="view-dashboard" class="view-section active">
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card c-blue">
+                        <div class="stat-header">
+                            <span>QUỸ PHÉP NĂM</span>
+                            <div class="stat-icon" style="background: rgba(56, 189, 248, 0.15); color: var(--primary);">
+                                <i data-lucide="award" style="width: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="statTotalQuota">12 <span style="font-size: 1rem; color: var(--text-muted);">ngày</span></div>
+                        <div class="stat-sub">Thâm niên 2 năm (+0 ngày)</div>
+                    </div>
+
+                    <div class="stat-card c-amber">
+                        <div class="stat-header">
+                            <span>ĐÃ SỬ DỤNG</span>
+                            <div class="stat-icon" style="background: var(--warning-bg); color: var(--warning);">
+                                <i data-lucide="clock" style="width: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="statUsed">3.0 <span style="font-size: 1rem; color: var(--text-muted);">ngày</span></div>
+                        <div class="stat-sub">Đã được phê duyệt chính thức</div>
+                    </div>
+
+                    <div class="stat-card c-purple">
+                        <div class="stat-header">
+                            <span>ĐANG CHỜ DUYỆT</span>
+                            <div class="stat-icon" style="background: var(--purple-bg); color: var(--purple);">
+                                <i data-lucide="hourglass" style="width: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="statPending">0 <span style="font-size: 1rem; color: var(--text-muted);">ngày</span></div>
+                        <div class="stat-sub">Tạm giữ chờ Sếp/HR duyệt</div>
+                    </div>
+
+                    <div class="stat-card c-green">
+                        <div class="stat-header">
+                            <span>QUỸ PHÉP CÒN LẠI</span>
+                            <div class="stat-icon" style="background: var(--success-bg); color: var(--success);">
+                                <i data-lucide="sparkles" style="width: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-value" id="statAvailable">9.0 <span style="font-size: 1rem; color: var(--text-muted);">ngày</span></div>
+                        <div class="stat-sub">Có thể quy đổi tiền cuối năm</div>
+                    </div>
+                </div>
+
+                <!-- Recent Leave History Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i data-lucide="clock-9" style="color: var(--primary);"></i>
+                            Đơn Xin Nghỉ Mới Nhất Của Tôi (Tự Động Đẩy Lên Đầu)
+                        </div>
+                        <button class="btn btn-primary" onclick="showView('create-leave')">
+                            <i data-lucide="plus" style="width: 16px;"></i> Tạo Đơn Nghỉ Mới (UC 1)
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MÃ ĐƠN</th>
+                                    <th>NHÂN VIÊN</th>
+                                    <th>LOẠI NGHỈ</th>
+                                    <th>THỜI GIAN NGHỈ</th>
+                                    <th>SỐ NGÀY</th>
+                                    <th>TIẾN TRÌNH XÉT DUYỆT</th>
+                                    <th>TRẠNG THÁI</th>
+                                    <th>THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentLeaveTableBody">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 2: CREATE LEAVE FORM (UC 1) ==================== -->
+            <div id="view-create-leave" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i data-lucide="file-edit" style="color: var(--primary);"></i>
+                            Lập Đơn Xin Nghỉ Phép (Use Case 1)
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">Mã Trace Code: <b>F01 / F03</b></span>
+                    </div>
+
+                    <!-- Dynamic Rule Warning Banner -->
+                    <div class="rule-banner" id="workflowBanner">
+                        <div class="rule-banner-icon">
+                            <i data-lucide="info" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <div class="rule-banner-title" id="ruleTitle">Quy tắc Luồng duyệt tự động (Dynamic Workflow Rule):</div>
+                            <div class="rule-banner-desc" id="ruleDesc">
+                                • Nghỉ ≤ 3 ngày: Chỉ cần <b>Trưởng phòng (Manager)</b> phê duyệt là hoàn tất.<br>
+                                • Nghỉ > 3 ngày: Bắt buộc duyệt 2 cấp (<b>Trưởng phòng</b> duyệt bước 1 $\rightarrow$ <b>HR Admin</b> duyệt bước 2).
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="leaveForm" onsubmit="event.preventDefault(); submitLeaveRequest('submit');">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Loại nghỉ phép <span class="req">*</span></label>
+                                <select id="leaveType" onchange="calculateDuration()">
+                                    <option value="Phép năm (Annual Leave)">Phép năm (Trừ vào quỹ phép 12 ngày)</option>
+                                    <option value="Nghỉ ốm (Sick Leave)">Nghỉ ốm (Cần đính kèm Giấy viện/Đơn thuốc)</option>
+                                    <option value="Nghỉ việc riêng không lương">Nghỉ việc riêng (Không hưởng lương)</option>
+                                    <option value="Nghỉ chế độ / Thai sản">Nghỉ chế độ / Thai sản (Theo Luật LĐ)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Người nhận bàn giao công việc <span class="req">*</span></label>
+                                <select id="handoverEmp">
+                                    <option value="EMP-002 - Trần Văn Bình">EMP-002 - Trần Văn Bình (Senior Dev)</option>
+                                    <option value="EMP-003 - Lê Thị Cúc">EMP-003 - Lê Thị Cúc (Tester QA)</option>
+                                    <option value="EMP-004 - Hoàng Nam">EMP-004 - Hoàng Nam (Business Analyst)</option>
+                                </select>
+                            </div>
+
+                            <!-- Custom Vietnamese Date Range Picker (100% Vietnamese Format: Ngày / Tháng / Năm) -->
+                            <div class="form-group">
+                                <label>Từ ngày (Ngày / Tháng / Năm) <span class="req">*</span></label>
+                                <div style="display: grid; grid-template-columns: 2fr 2.5fr 2fr; gap: 6px;">
+                                    <select id="startDay" onchange="calculateDurationCustom()">
+                                        <!-- Days 01 - 31 -->
+                                    </select>
+                                    <select id="startMonth" onchange="calculateDurationCustom()">
+                                        <!-- Months 01 - 12 -->
+                                    </select>
+                                    <select id="startYear" onchange="calculateDurationCustom()">
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Đến ngày (Ngày / Tháng / Năm) <span class="req">*</span></label>
+                                <div style="display: grid; grid-template-columns: 2fr 2.5fr 2fr; gap: 6px;">
+                                    <select id="endDay" onchange="calculateDurationCustom()">
+                                        <!-- Days 01 - 31 -->
+                                    </select>
+                                    <select id="endMonth" onchange="calculateDurationCustom()">
+                                        <!-- Months 01 - 12 -->
+                                    </select>
+                                    <select id="endYear" onchange="calculateDurationCustom()">
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Quick Select Date Presets for Instant BA Testing -->
+                            <div class="form-group col-span-2">
+                                <label style="font-size: 0.78rem; color: var(--text-muted);">⚡ Chọn nhanh số ngày nghỉ để thử nghiệm luồng:</label>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 4px;">
+                                    <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="setPresetDaysVN(1)">
+                                        Nghỉ 1 ngày (1 cấp)
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="setPresetDaysVN(2)">
+                                        Nghỉ 2 ngày (1 cấp)
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem;" onclick="setPresetDaysVN(3)">
+                                        Nghỉ 3 ngày (1 cấp)
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem; border-color: rgba(168, 85, 247, 0.4); color: var(--purple);" onclick="setPresetDaysVN(5)">
+                                        ⚡ Nghỉ 5 ngày (Duyệt 2 cấp)
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.78rem; border-color: rgba(168, 85, 247, 0.4); color: var(--purple);" onclick="setPresetDaysVN(7)">
+                                        ⚡ Nghỉ 7 ngày (Duyệt 2 cấp)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-span-2">
+                                <div style="background: rgba(11, 15, 25, 0.6); border: 1px solid var(--border-color); padding: 0.85rem 1.25rem; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <span style="font-size: 0.85rem; color: var(--text-secondary);">Tổng thời gian xin nghỉ:</span>
+                                        <b id="calculatedDays" style="font-size: 1.15rem; color: var(--primary); margin-left: 8px;">2.0 ngày</b>
+                                    </div>
+                                    <div id="routingBadge" class="badge badge-approved">
+                                        Luồng duyệt 1 Cấp (Trưởng phòng)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-span-2">
+                                <label>Lý do xin nghỉ <span class="req">*</span></label>
+                                <textarea id="leaveReason" rows="3" placeholder="Nhập lý do chi tiết (VD: Giải quyết việc gia đình, Bị sốt xuất huyết...)" required>Giải quyết việc cá nhân gia đình và về quê.</textarea>
+                            </div>
+
+                            <div class="form-group col-span-2">
+                                <label>Đính kèm chứng từ y tế / Giấy viện (Nếu nghỉ ốm đột xuất - Backdate)</label>
+                                <div class="dropzone" onclick="document.getElementById('fileUpload').click()">
+                                    <i data-lucide="paperclip" style="color: var(--primary); width: 24px;"></i>
+                                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Kéo thả file hoặc bấm vào đây để upload (PDF, JPG, PNG - Tối đa 5MB)</span>
+                                    <span id="attachedFileName" style="font-size: 0.75rem; color: var(--success); font-weight: 600;"></span>
+                                    <input type="file" id="fileUpload" style="display: none;" onchange="handleFileSelected(this)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.06);">
+                            <button type="button" class="btn btn-secondary" onclick="submitLeaveRequest('draft')">
+                                <i data-lucide="save" style="width: 16px;"></i> Lưu Nháp (Draft)
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-lucide="send" style="width: 16px;"></i> Nộp Đơn (Submit Request)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 3: MY LEAVES HISTORY ==================== -->
+            <div id="view-my-leaves" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i data-lucide="history" style="color: var(--primary);"></i>
+                            Danh Sách Lịch Sử Đơn Của Tôi (Sắp Xếp Mới Nhất Lên Đầu)
+                        </div>
+                        
+                        <div class="filter-toolbar">
+                            <div class="search-box">
+                                <i data-lucide="search" style="width: 14px; color: var(--text-muted);"></i>
+                                <input type="text" id="myLeaveSearch" placeholder="Tìm theo mã / lý do..." oninput="renderTables()">
+                            </div>
+                            <select id="myLeaveStatusFilter" style="padding: 0.45rem 0.75rem; font-size: 0.85rem;" onchange="renderTables()">
+                                <option value="ALL">Tất cả trạng thái</option>
+                                <option value="Pending">Đang chờ duyệt</option>
+                                <option value="Approved">Đã phê duyệt</option>
+                                <option value="Rejected">Đã từ chối</option>
+                                <option value="Cancelled">Đã hủy đơn</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MÃ ĐƠN</th>
+                                    <th>NHÂN VIÊN</th>
+                                    <th>LOẠI NGHỈ</th>
+                                    <th>THỜI GIAN NGHỈ</th>
+                                    <th>SỐ NGÀY</th>
+                                    <th>LÝ DO</th>
+                                    <th>TIẾN ĐỘ & NGƯỜI DUYỆT</th>
+                                    <th>TRẠNG THÁI</th>
+                                    <th>HÀNH ĐỘNG (UC 3)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="myLeavesTableBody">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 4: APPROVALS (UC 2) ==================== -->
+            <div id="view-approvals" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">
+                                <i data-lucide="clipboard-check" style="color: var(--warning);"></i>
+                                Danh Sách Xét Duyệt Đơn Nghỉ Phép (Use Case 2)
+                            </div>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);" id="approverRoleDesc">Đang xem dưới quyền: <b>Trưởng phòng</b></span>
+                        </div>
+                        
+                        <div class="filter-toolbar">
+                            <div class="search-box">
+                                <i data-lucide="search" style="width: 14px; color: var(--text-muted);"></i>
+                                <input type="text" id="approvalSearch" placeholder="Tìm theo tên NV / mã..." oninput="renderTables()">
+                            </div>
+                            <select id="approvalStatusFilter" style="padding: 0.45rem 0.75rem; font-size: 0.85rem;" onchange="renderTables()">
+                                <option value="ALL">Tất cả (Chờ duyệt & Đã duyệt)</option>
+                                <option value="Pending" selected>⚡ Chỉ đơn Chờ duyệt</option>
+                                <option value="Approved">✅ Đơn Đã Phê Duyệt</option>
+                                <option value="Rejected">❌ Đơn Đã Từ Chối</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Quick Status Filter Pills -->
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-primary" id="pillAll" style="padding: 5px 12px; font-size: 0.78rem;" onclick="setApprovalTab('ALL')">
+                            Tất cả đơn xét duyệt
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="pillPending" style="padding: 5px 12px; font-size: 0.78rem; border-color: rgba(245, 158, 11, 0.4); color: var(--warning);" onclick="setApprovalTab('Pending')">
+                            ⚡ Đang chờ duyệt (<span id="pillPendingCount">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="pillApproved" style="padding: 5px 12px; font-size: 0.78rem; border-color: rgba(34, 197, 94, 0.4); color: var(--success);" onclick="setApprovalTab('Approved')">
+                            ✅ Đã phê duyệt (<span id="pillApprovedCount">0</span>)
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="pillRejected" style="padding: 5px 12px; font-size: 0.78rem; border-color: rgba(239, 68, 68, 0.4); color: #f87171;" onclick="setApprovalTab('Rejected')">
+                            ❌ Đã từ chối (<span id="pillRejectedCount">0</span>)
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MÃ ĐƠN</th>
+                                    <th>NHÂN VIÊN</th>
+                                    <th>PHÒNG BAN</th>
+                                    <th>LOẠI NGHỈ</th>
+                                    <th>THỜI GIAN</th>
+                                    <th>SỐ NGÀY</th>
+                                    <th>BƯỚC DUYỆT HIỆN TẠI</th>
+                                    <th>TRẠNG THÁI</th>
+                                    <th>THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="approvalsTableBody">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 5: HR CONFIGURATION (DYNAMIC WORKFLOW ENGINE) ==================== -->
+            <div id="view-hr-config" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">
+                                <i data-lucide="cpu" style="color: var(--purple);"></i>
+                                Hệ Thống Cấu Hình Luồng Duyệt Động (Dynamic Workflow & Rule Matrix Engine)
+                            </div>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);">Cấu hình No-Code: Tự động phân giải các cấp duyệt theo Loại nghỉ, Số ngày (1-3 ngày, >3 ngày, >7 ngày), và Người nhận thông báo.</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="openAddRuleModal()">
+                            <i data-lucide="plus-circle" style="width: 14px;"></i> Thêm Quy Tắc Mới
+                        </button>
+                    </div>
+
+                    <!-- Rule Explanation Alert -->
+                    <div class="rule-banner" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.15)); border-color: rgba(56, 189, 248, 0.3);">
+                        <div class="rule-banner-icon"><i data-lucide="git-branch" style="width: 20px; color: var(--primary);"></i></div>
+                        <div>
+                            <div class="rule-banner-title" style="color: var(--primary);">Cơ Chế Phân Giải Quy Tắc Linh Hoạt (Workflow Resolution Engine):</div>
+                            <div class="rule-banner-desc" style="font-size: 0.82rem; line-height: 1.5;">
+                                Khi nhân viên nộp đơn, hệ thống tự động quét ma trận quy tắc theo điều kiện: <b>[Loại nghỉ] + [Số ngày nghỉ]</b> để gắn vào <b>Mã Workflow ID</b> tương ứng. Thay đổi cấu hình tại đây sẽ có hiệu lực <b>ngay lập tức</b> trên toàn bộ hệ thống!
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workflow Rules Table -->
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>MÃ RULE</th>
+                                    <th>LOẠI NGHỈ PHÉP</th>
+                                    <th>KHOẢNG THỜI GIAN</th>
+                                    <th>WORKFLOW ID</th>
+                                    <th>CÁC BƯỚC DUYỆT (STEP SEQUENCE)</th>
+                                    <th>KÊNH THÔNG BÁO</th>
+                                    <th>TRẠNG THÁI</th>
+                                    <th>THAO TÁC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rulesTableBody">
+                                <!-- Rendered dynamically via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Dynamic Visual Flow Simulator -->
+                    <div style="margin-top: 2rem; padding: 1.25rem; background: rgba(11, 15, 25, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                        <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; color: var(--text-primary);">
+                            <i data-lucide="git-merge" style="width: 16px; color: var(--warning);"></i> 
+                            Sơ Đồ Trực Quan Các Luồng Duyệt Đang Kích Hoạt Trong Doanh Nghiệp:
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                            <!-- Flow 1 -->
+                            <div style="padding: 1rem; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-weight: 700; color: var(--success); font-size: 0.85rem;">WF_01: Luồng 1 Cấp (Nghỉ ≤ 3 ngày)</span>
+                                    <span class="badge badge-approved" style="font-size: 0.7rem;">Active</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary);">
+                                    <span>👤 Nhân viên nộp</span>
+                                    <i data-lucide="arrow-right" style="width: 14px;"></i>
+                                    <span style="color: var(--primary); font-weight: 600;">🛡️ Trưởng phòng duyệt (24h)</span>
+                                    <i data-lucide="arrow-right" style="width: 14px;"></i>
+                                    <span style="color: var(--success); font-weight: 600;">✅ Hoàn tất</span>
+                                </div>
+                            </div>
+
+                            <!-- Flow 2 -->
+                            <div style="padding: 1rem; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-weight: 700; color: var(--purple); font-size: 0.85rem;">WF_02: Luồng 2 Cấp (Nghỉ 3.5 - 7 ngày)</span>
+                                    <span class="badge badge-approved" style="font-size: 0.7rem;">Active</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); flex-wrap: wrap;">
+                                    <span>👤 Nhân viên</span>
+                                    <i data-lucide="arrow-right" style="width: 14px;"></i>
+                                    <span style="color: var(--primary);">🛡️ Trưởng phòng</span>
+                                    <i data-lucide="arrow-right" style="width: 14px;"></i>
+                                    <span style="color: var(--purple); font-weight: 600;">🏢 HR Admin</span>
+                                    <i data-lucide="arrow-right" style="width: 14px;"></i>
+                                    <span style="color: var(--success); font-weight: 600;">✅ Hoàn tất</span>
+                                </div>
+                            </div>
+
+                            <!-- Flow 3 -->
+                            <div style="padding: 1rem; background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-weight: 700; color: var(--warning); font-size: 0.85rem;">WF_03: Luồng 3 Cấp (Nghỉ > 7 ngày)</span>
+                                    <span class="badge badge-approved" style="font-size: 0.7rem;">Active</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); flex-wrap: wrap;">
+                                    <span>👤 NV</span>
+                                    <i data-lucide="arrow-right" style="width: 12px;"></i>
+                                    <span>🛡️ Sếp</span>
+                                    <i data-lucide="arrow-right" style="width: 12px;"></i>
+                                    <span>🏢 HR</span>
+                                    <i data-lucide="arrow-right" style="width: 12px;"></i>
+                                    <span style="color: var(--warning); font-weight: 600;">👔 Giám Đốc (BOD)</span>
+                                    <i data-lucide="arrow-right" style="width: 12px;"></i>
+                                    <span style="color: var(--success);">✅ Hoàn tất</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== VIEW 6: AUDIT LOGS ==================== -->
+            <div id="view-audit-logs" class="view-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i data-lucide="shield" style="color: var(--primary);"></i>
+                            Nhật Ký Kiểm Toán Hệ Thống (Audit Trail Log)
+                        </div>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">Sắp xếp mới nhất lên đầu</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>THỜI GIAN</th>
+                                    <th>TÁC NHÂN (ACTOR)</th>
+                                    <th>HÀNH ĐỘNG</th>
+                                    <th>ĐỐI TƯỢNG (RECORD)</th>
+                                    <th>CHI TIẾT THAY ĐỔI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Phê Duyệt / Từ Chối Chi Tiết -->
+    <div class="modal-overlay" id="approvalModal">
+        <div class="modal">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 700;" id="modalTitle">Chi Tiết Đơn Xin Nghỉ Phép</h3>
+                <button onclick="closeModal()" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer;"><i data-lucide="x"></i></button>
+            </div>
+
+            <div id="modalContent" style="font-size: 0.88rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label>Ý kiến / Nhận xét phê duyệt <span style="font-size: 0.75rem; color: var(--text-muted);">(Bắt buộc nếu Từ chối)</span></label>
+                <textarea id="approverComment" rows="2" placeholder="Nhập nhận xét hoặc lý do từ chối..."></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                <button class="btn btn-secondary" onclick="closeModal()">Đóng</button>
+                <button class="btn btn-danger" onclick="executeApproval('reject')">
+                    <i data-lucide="x-circle" style="width: 16px;"></i> Từ Chối (Reject)
+                </button>
+                <button class="btn btn-success" onclick="executeApproval('approve')">
+                    <i data-lucide="check-circle-2" style="width: 16px;"></i> Phê Duyệt (Approve)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Box -->
+    <div id="toastBox" class="toast success">
+        <i data-lucide="check-circle-2" id="toastIcon" style="width: 20px;"></i>
+        <div id="toastMessage" style="font-size: 0.88rem; font-weight: 600;">Thông báo thành công</div>
+    </div>
+
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        let currentRole = 'employee'; // 'employee', 'manager', 'hr'
+        let currentSelectedLeaveId = null;
+        let lastCreatedLeaveId = null;
+        let editingDraftId = null; // Track if editing an existing draft
+
+        let leaveDatabase = [
+            {
+                id: "LR-2026-003",
+                empId: "EMP-001",
+                empName: "Nguyễn Văn An",
+                dept: "Kỹ thuật IT",
+                type: "Phép năm (Annual Leave)",
+                startDate: "2026-09-08",
+                endDate: "2026-09-09",
+                days: 2.0,
+                reason: "Giải quyết việc cá nhân gia đình và về quê.",
+                handover: "EMP-002 - Trần Văn Bình",
+                status: "Pending Manager Approval",
+                step: "Chờ Trưởng phòng duyệt",
+                approverHistory: "Đã gửi tới Trưởng phòng (Trần Văn Bình)",
+                createdDate: "2026-09-03 10:15",
+                hasAttachment: false
+            },
+            {
+                id: "LR-2026-002",
+                empId: "EMP-005",
+                empName: "Phạm Hồng Ngọc",
+                dept: "Marketing",
+                type: "Phép năm (Annual Leave)",
+                startDate: "2026-09-15",
+                endDate: "2026-09-19",
+                days: 5.0,
+                reason: "Du lịch nghỉ mát cùng gia đình hàng năm.",
+                handover: "EMP-006 - Lê Hoàng",
+                status: "Pending HR Approval",
+                step: "Trưởng phòng ĐÃ DUYỆT → Chờ HR duyệt",
+                approverHistory: "Trưởng phòng Trần Văn Bình đã duyệt bước 1 → Đang chờ HR Lê Thị C duyệt bước 2",
+                createdDate: "2026-09-02 14:20",
+                hasAttachment: false
+            },
+            {
+                id: "LR-2026-001",
+                empId: "EMP-001",
+                empName: "Nguyễn Văn An",
+                dept: "Kỹ thuật IT",
+                type: "Nghỉ ốm (Sick Leave)",
+                startDate: "2026-08-10",
+                endDate: "2026-08-12",
+                days: 3.0,
+                reason: "Sốt siêu vi nằm viện điều trị theo chỉ định bác sĩ.",
+                handover: "EMP-003 - Lê Thị Cúc",
+                status: "Approved",
+                step: "Đã hoàn tất duyệt",
+                approverHistory: "Trưởng phòng & HR đã duyệt → Đã trừ 3 ngày phép",
+                createdDate: "2026-08-09 08:30",
+                hasAttachment: true
+            }
+        ];
+
+        let auditLogs = [
+            { time: "2026-09-03 10:15:22", actor: "Nguyễn Văn An (Employee)", action: "CREATE_SUBMIT", record: "LR-2026-003", detail: "Nộp đơn xin nghỉ 2 ngày, tạm khóa 2 ngày phép" },
+            { time: "2026-09-02 16:30:10", actor: "Trần Trưởng Phòng (Manager)", action: "APPROVE_STEP1", record: "LR-2026-002", detail: "Duyệt bước 1 đơn 5 ngày (>3 ngày), chuyển tiếp HR" },
+            { time: "2026-08-09 11:45:00", actor: "Lê HR Admin (HR Core)", action: "APPROVE_FINAL", record: "LR-2026-001", detail: "Duyệt đơn ốm, trừ 3 ngày phép" }
+        ];
+
+        // ==================== APP INITIALIZATION ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initDateDropdowns();
+            renderRulesTable();
+            sortAndRender();
+            updateStats();
+        });
+
+        // Initialize Vietnamese Day / Month dropdowns
+        function initDateDropdowns() {
+            const startDay = document.getElementById('startDay');
+            const endDay = document.getElementById('endDay');
+            const startMonth = document.getElementById('startMonth');
+            const endMonth = document.getElementById('endMonth');
+
+            if (!startDay) return;
+
+            startDay.innerHTML = '';
+            endDay.innerHTML = '';
+            for (let d = 1; d <= 31; d++) {
+                let dStr = String(d).padStart(2, '0');
+                startDay.innerHTML += `<option value="${dStr}">Ngày ${dStr}</option>`;
+                endDay.innerHTML += `<option value="${dStr}">Ngày ${dStr}</option>`;
+            }
+
+            startMonth.innerHTML = '';
+            endMonth.innerHTML = '';
+            for (let m = 1; m <= 12; m++) {
+                let mStr = String(m).padStart(2, '0');
+                startMonth.innerHTML += `<option value="${mStr}">Tháng ${mStr}</option>`;
+                endMonth.innerHTML += `<option value="${mStr}">Tháng ${mStr}</option>`;
+            }
+
+            // Default: Từ 09/08/2026 đến 11/08/2026 (Theo đúng ví dụ của bạn)
+            startDay.value = "09";
+            startMonth.value = "08";
+            endDay.value = "11";
+            endMonth.value = "08";
+
+            calculateDurationCustom();
+        }
+
+        // Helper: Always sort latest created on top
+        function getSortedDatabase() {
+            return [...leaveDatabase].sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+        }
+        // ==================== DYNAMIC WORKFLOW & RULE MATRIX ENGINE ====================
+        let rulesDatabase = [
+            {
+                id: "RULE-01",
+                leaveType: "Phép năm (Annual Leave)",
+                minDays: 0.5,
+                maxDays: 3.0,
+                workflowId: "WF_01",
+                workflowName: "Luồng 1 Cấp (Trưởng phòng)",
+                steps: ["1. Trưởng phòng trực tiếp (24h)"],
+                notify: "Email, App Push",
+                status: "Active"
+            },
+            {
+                id: "RULE-02",
+                leaveType: "Phép năm (Annual Leave)",
+                minDays: 3.5,
+                maxDays: 7.0,
+                workflowId: "WF_02",
+                workflowName: "Luồng 2 Cấp (Sếp + HR)",
+                steps: ["1. Trưởng phòng (24h)", "2. HR Admin (48h)"],
+                notify: "Email, App Push, Slack",
+                status: "Active"
+            },
+            {
+                id: "RULE-03",
+                leaveType: "Phép năm (Annual Leave)",
+                minDays: 7.5,
+                maxDays: 999.0,
+                workflowId: "WF_03",
+                workflowName: "Luồng 3 Cấp (Sếp + HR + Giám Đốc BOD)",
+                steps: ["1. Trưởng phòng (24h)", "2. Trưởng HR (24h)", "3. Tổng Giám Đốc - BOD (72h)"],
+                notify: "Email, SMS, App Push",
+                status: "Active"
+            },
+            {
+                id: "RULE-04",
+                leaveType: "Nghỉ việc riêng không lương",
+                minDays: 0.5,
+                maxDays: 5.0,
+                workflowId: "WF_01",
+                workflowName: "Luồng 1 Cấp (Trưởng phòng)",
+                steps: ["1. Trưởng phòng trực tiếp (24h)"],
+                notify: "Email",
+                status: "Active"
+            },
+            {
+                id: "RULE-05",
+                leaveType: "Nghỉ ốm (Sick Leave)",
+                minDays: 0.5,
+                maxDays: 999.0,
+                workflowId: "WF_02",
+                workflowName: "Luồng 2 Cấp (Đối soát chứng từ y tế)",
+                steps: ["1. Trưởng phòng xác nhận", "2. HR kiểm tra Giấy viện/Đơn thuốc"],
+                notify: "Email, Notification",
+                status: "Active"
+            }
+        ];
+
+        function renderRulesTable() {
+            const body = document.getElementById('rulesTableBody');
+            if (!body) return;
+
+            body.innerHTML = rulesDatabase.map(rule => `
+                <tr>
+                    <td><b style="color: var(--primary);">${rule.id}</b></td>
+                    <td><b>${rule.leaveType}</b></td>
+                    <td>
+                        <span style="background: rgba(56, 189, 248, 0.1); color: var(--primary); padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8rem;">
+                            ${rule.minDays} → ${rule.maxDays === 999 ? 'Không giới hạn' : rule.maxDays + ' ngày'}
+                        </span>
+                    </td>
+                    <td><span class="badge badge-hr">${rule.workflowId}</span></td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 3px; font-size: 0.78rem;">
+                            ${rule.steps.map(s => `<span>• ${s}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td style="font-size: 0.8rem; color: var(--text-secondary);">${rule.notify}</td>
+                    <td><span class="badge badge-approved">${rule.status}</span></td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.75rem;" onclick="editRulePrompt('${rule.id}')">
+                            <i data-lucide="edit-2" style="width: 12px;"></i> Sửa Rule
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function editRulePrompt(ruleId) {
+            const rule = rulesDatabase.find(r => r.id === ruleId);
+            if (!rule) return;
+
+            const newMax = prompt(`[CẤU HÌNH ĐỘNG] Nhập số ngày tối đa cho ${rule.id} (${rule.leaveType}):`, rule.maxDays);
+            if (newMax !== null && !isNaN(parseFloat(newMax))) {
+                rule.maxDays = parseFloat(newMax);
+                renderRulesTable();
+                calculateDurationCustom(); // Re-eval dynamic rules on active form
+                showToast(`Đã cập nhật giới hạn ${rule.id} thành ${newMax} ngày! Hệ thống lập tức áp dụng rule mới.`, 'success');
+            }
+        }
+
+        function openAddRuleModal() {
+            const newType = prompt("Nhập Loại nghỉ cần tạo quy tắc (VD: Nghỉ thai sản, Nghỉ kết hôn):", "Nghỉ kết hôn");
+            if (!newType) return;
+            const newMax = prompt("Số ngày nghỉ tối đa áp dụng luồng 1 cấp:", "3");
+
+            const newId = "RULE-0" + (rulesDatabase.length + 1);
+            rulesDatabase.push({
+                id: newId,
+                leaveType: newType,
+                minDays: 0.5,
+                maxDays: parseFloat(newMax) || 3.0,
+                workflowId: "WF_01",
+                workflowName: "Luồng 1 Cấp (Trưởng phòng)",
+                steps: ["1. Trưởng phòng trực tiếp"],
+                notify: "Email, App Push",
+                status: "Active"
+            });
+
+            renderRulesTable();
+            showToast(`Đã thêm thành công quy tắc [${newId}] vào hệ thống!`, 'success');
+        }
+
+        // ==================== VIETNAMESE DURATION CALCULATOR (DYNAMIC RESOLUTION) ====================
+        function calculateDurationCustom() {
+            const sD = parseInt(document.getElementById('startDay')?.value || 9);
+            const sM = parseInt(document.getElementById('startMonth')?.value || 8) - 1;
+            const sY = parseInt(document.getElementById('startYear')?.value || 2026);
+
+            const eD = parseInt(document.getElementById('endDay')?.value || 11);
+            const eM = parseInt(document.getElementById('endMonth')?.value || 8) - 1;
+            const eY = parseInt(document.getElementById('endYear')?.value || 2026);
+
+            const startDate = new Date(sY, sM, sD);
+            const endDate = new Date(eY, eM, eD);
+
+            let diffTime = endDate - startDate;
+            let diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            const daysDisplay = document.getElementById('calculatedDays');
+            const badge = document.getElementById('routingBadge');
+            const ruleTitle = document.getElementById('ruleTitle');
+            const ruleDesc = document.getElementById('ruleDesc');
+            const currentLeaveType = document.getElementById('leaveType')?.value || "Phép năm (Annual Leave)";
+
+            if (!daysDisplay) return;
+
+            if (diffDays <= 0) {
+                daysDisplay.innerHTML = `<span style="color: var(--danger);">0 ngày (Ngày kết thúc phải $\ge$ Ngày bắt đầu)</span>`;
+                badge.className = "badge badge-rejected";
+                badge.textContent = "Lỗi chọn ngày";
+                return;
+            }
+
+            daysDisplay.textContent = diffDays + ".0 ngày";
+
+            // DYNAMIC MATCHING AGAINST RULES DATABASE
+            let matchedRule = rulesDatabase.find(r => 
+                r.leaveType === currentLeaveType && 
+                diffDays >= r.minDays && 
+                diffDays <= r.maxDays
+            );
+
+            // Fallback default
+            if (!matchedRule) {
+                if (diffDays > 7) {
+                    matchedRule = rulesDatabase.find(r => r.workflowId === "WF_03") || rulesDatabase[2];
+                } else if (diffDays > 3) {
+                    matchedRule = rulesDatabase.find(r => r.workflowId === "WF_02") || rulesDatabase[1];
+                } else {
+                    matchedRule = rulesDatabase[0];
+                }
+            }
+
+            if (matchedRule.workflowId === "WF_03") {
+                badge.className = "badge badge-cancelled";
+                badge.style.borderColor = "var(--warning)";
+                badge.style.color = "var(--warning)";
+                badge.textContent = `⚡ Ăn vào ${matchedRule.workflowId}: Duyệt 3 Cấp (Sếp + HR + Giám Đốc BOD)`;
+                ruleTitle.innerHTML = `<span style="color: var(--warning)">⚡ Đơn ${diffDays} ngày (> 7 ngày): Kích hoạt Luồng 3 Cấp (${matchedRule.workflowId})</span>`;
+                ruleDesc.innerHTML = `Theo <b>${matchedRule.id}</b>: Đơn nghỉ <b>${diffDays} ngày</b> bắt buộc qua 3 bước: <b>Trưởng phòng</b> $\rightarrow$ <b>Trưởng HR</b> $\rightarrow$ <b>Tổng Giám Đốc (BOD)</b> phê duyệt. Thông báo: ${matchedRule.notify}.`;
+            } else if (matchedRule.workflowId === "WF_02") {
+                badge.className = "badge badge-hr";
+                badge.textContent = `⚡ Ăn vào ${matchedRule.workflowId}: Duyệt 2 Cấp (Sếp + HR)`;
+                ruleTitle.innerHTML = `<span style="color: var(--purple)">⚡ Đơn ${diffDays} ngày (3.5 - 7 ngày): Tự động rẽ nhánh ${matchedRule.workflowId}</span>`;
+                ruleDesc.innerHTML = `Theo <b>${matchedRule.id}</b>: Đơn <b>${diffDays} ngày</b> sẽ qua 2 bước: <b>Trưởng phòng</b> duyệt trước $\rightarrow$ chuyển tiếp <b>HR Admin</b> duyệt chốt.`;
+            } else {
+                badge.className = "badge badge-approved";
+                badge.textContent = `Ăn vào ${matchedRule.workflowId}: Duyệt 1 Cấp (Trưởng phòng)`;
+                ruleTitle.innerHTML = `Quy tắc phân giải: Khớp <b>${matchedRule.id}</b> (${matchedRule.workflowId})`;
+                ruleDesc.innerHTML = `Đơn <b>${diffDays} ngày</b> (≤ 3 ngày): Chỉ cần <b>Trưởng phòng trực tiếp</b> duyệt là hoàn tất.`;
+            }
+        }
+
+        function setPresetDaysVN(numDays) {
+            const sD = 9;
+            const sM = 8;
+            const sY = 2026;
+
+            const startDate = new Date(sY, sM - 1, sD);
+            const endDate = new Date(sY, sM - 1, sD + numDays - 1);
+
+            document.getElementById('startDay').value = String(startDate.getDate()).padStart(2, '0');
+            document.getElementById('startMonth').value = String(startDate.getMonth() + 1).padStart(2, '0');
+            document.getElementById('startYear').value = String(startDate.getFullYear());
+
+            document.getElementById('endDay').value = String(endDate.getDate()).padStart(2, '0');
+            document.getElementById('endMonth').value = String(endDate.getMonth() + 1).padStart(2, '0');
+            document.getElementById('endYear').value = String(endDate.getFullYear());
+
+            calculateDurationCustom();
+            showToast(`Đã chọn khoảng thời gian ${numDays} ngày (Từ ${document.getElementById('startDay').value}/${document.getElementById('startMonth').value} đến ${document.getElementById('endDay').value}/${document.getElementById('endMonth').value})`, 'info');
+        }
+
+        // ==================== SWITCH ROLES ====================
+        function switchRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+
+            const avatar = document.getElementById('currentAvatar');
+            const name = document.getElementById('currentUserName');
+            const roleText = document.getElementById('currentUserRole');
+            const approverDesc = document.getElementById('approverRoleDesc');
+
+            if (role === 'employee') {
+                document.getElementById('btnRoleEmp').classList.add('active');
+                avatar.textContent = 'NV';
+                avatar.style.background = 'linear-gradient(135deg, #6366f1, #a855f7)';
+                name.textContent = 'Nguyễn Văn An';
+                roleText.textContent = 'Nhân viên - Phòng IT';
+                document.getElementById('navCreateLeave').style.display = 'flex';
+                showToast('Chuyển sang vai: Nhân viên (Xem danh sách đơn đã được cập nhật kết quả duyệt)', 'info');
+            } else if (role === 'manager') {
+                document.getElementById('btnRoleMgr').classList.add('active');
+                avatar.textContent = 'TP';
+                avatar.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                name.textContent = 'Trần Trưởng Phòng';
+                roleText.textContent = 'Quản lý trực tiếp (Manager)';
+                approverDesc.innerHTML = 'Đang xem dưới quyền: <b>Trưởng phòng (Duyệt bước 1)</b>';
+                showToast('Chuyển sang vai: Trưởng phòng (Có đơn mới của Nhân viên cần duyệt)', 'info');
+            } else if (role === 'hr') {
+                document.getElementById('btnRoleHR').classList.add('active');
+                avatar.textContent = 'HR';
+                avatar.style.background = 'linear-gradient(135deg, #a855f7, #7c3aed)';
+                name.textContent = 'Lê Thị HR Admin';
+                roleText.textContent = 'Phòng Nhân sự (HR Core)';
+                approverDesc.innerHTML = 'Đang xem dưới quyền: <b>HR Admin (Duyệt bước 2 & Chốt lương)</b>';
+                showToast('Chuyển sang vai: HR Admin (Duyệt đơn > 3 ngày & Đối soát)', 'info');
+            }
+
+            sortAndRender();
+            updateStats();
+        }
+
+        // ==================== VIEW ROUTING ====================
+        function showView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const targetView = document.getElementById('view-' + viewId);
+            if (targetView) targetView.classList.add('active');
+
+            // Highlight nav
+            const navMap = {
+                'dashboard': 'navDashboard',
+                'create-leave': 'navCreateLeave',
+                'my-leaves': 'navMyLeaves',
+                'approvals': 'navApprovals',
+                'hr-config': 'navHRConfig',
+                'audit-logs': 'navAuditLogs'
+            };
+            if (navMap[viewId]) {
+                const navEl = document.getElementById(navMap[viewId]);
+                if (navEl) navEl.classList.add('active');
+            }
+
+            if (viewId === 'hr-config') {
+                renderRulesTable();
+            }
+
+            sortAndRender();
+            lucide.createIcons();
+        }
+
+        // ==================== DURATION & RULE CALCULATOR ====================
+        function onStartDateChange() {
+            const startVal = document.getElementById('startDate').value;
+            const endInput = document.getElementById('endDate');
+            if (startVal) {
+                endInput.min = startVal;
+                // If end date is earlier than start date, bump it
+                if (endInput.value && new Date(endInput.value) < new Date(startVal)) {
+                    endInput.value = startVal;
+                }
+            }
+            calculateDuration();
+        }
+
+        function setPresetDays(numDays) {
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+            
+            const now = new Date();
+            // Default to starting tomorrow
+            now.setDate(now.getDate() + 1);
+            
+            const startStr = now.toISOString().split('T')[0];
+            
+            const endDateObj = new Date(now);
+            endDateObj.setDate(endDateObj.getDate() + (numDays - 1));
+            const endStr = endDateObj.toISOString().split('T')[0];
+            
+            startInput.value = startStr;
+            endInput.value = endStr;
+            endInput.min = startStr;
+            
+            calculateDuration();
+            showToast(`Đã chọn khoảng thời gian nghỉ ${numDays} ngày!`, 'info');
+        }
+        function calculateDuration() {
+            const start = new Date(document.getElementById('startDate').value);
+            const end = new Date(document.getElementById('endDate').value);
+            
+            if (isNaN(start) || isNaN(end)) return;
+
+            let diffTime = end - start;
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            if (diffDays <= 0) {
+                diffDays = 0;
+                document.getElementById('calculatedDays').textContent = "0 ngày (Lỗi chọn ngày)";
+                return;
+            }
+
+            document.getElementById('calculatedDays').textContent = diffDays + ".0 ngày";
+
+            const badge = document.getElementById('routingBadge');
+            const ruleTitle = document.getElementById('ruleTitle');
+            const ruleDesc = document.getElementById('ruleDesc');
+
+            if (diffDays > 3) {
+                badge.className = "badge badge-hr";
+                badge.textContent = "Kích hoạt Luồng duyệt 2 Cấp (Manager + HR)";
+                ruleTitle.innerHTML = `<span style="color: var(--purple)">⚡ Đơn > 3 ngày: Tự động rẽ nhánh sang Luồng Duyệt 2 Cấp</span>`;
+                ruleDesc.innerHTML = `Đơn ${diffDays} ngày sẽ được chuyển tới <b>Trưởng phòng</b> duyệt trước, sau đó hệ thống tự động chuyển tiếp tới <b>HR Admin</b> duyệt bước cuối.`;
+            } else {
+                badge.className = "badge badge-approved";
+                badge.textContent = "Luồng duyệt 1 Cấp (Trưởng phòng)";
+                ruleTitle.innerHTML = `Quy tắc Luồng duyệt tự động (Dynamic Workflow Rule):`;
+                ruleDesc.innerHTML = `Đơn ${diffDays} ngày chỉ cần <b>Trưởng phòng</b> duyệt là hoàn tất.`;
+            }
+        }
+
+        function handleFileSelected(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('attachedFileName').textContent = `✓ Đã đính kèm: ${input.files[0].name}`;
+            }
+        }
+
+        // ==================== EDIT DRAFT FUNCTIONALITY ====================
+        function editDraft(leaveId) {
+            const item = leaveDatabase.find(x => x.id === leaveId);
+            if (!item) return;
+
+            editingDraftId = leaveId;
+
+            // Fill form fields
+            document.getElementById('leaveType').value = item.type;
+            document.getElementById('handoverEmp').value = item.handover;
+            document.getElementById('leaveReason').value = item.reason;
+
+            // Split date "YYYY-MM-DD"
+            const startParts = item.startDate.split('-');
+            if (startParts.length === 3) {
+                document.getElementById('startYear').value = startParts[0];
+                document.getElementById('startMonth').value = startParts[1];
+                document.getElementById('startDay').value = startParts[2];
+            }
+
+            const endParts = item.endDate.split('-');
+            if (endParts.length === 3) {
+                document.getElementById('endYear').value = endParts[0];
+                document.getElementById('endMonth').value = endParts[1];
+                document.getElementById('endDay').value = endParts[2];
+            }
+
+            calculateDurationCustom();
+
+            // Switch to form view
+            showView('create-leave');
+            showToast(`Đang mở lại bản nháp [${leaveId}]. Bạn có thể chỉnh sửa và bấm "Nộp Đơn" hoặc "Lưu Nháp".`, 'info');
+        }
+
+        // ==================== SUBMIT LEAVE REQUEST (UC 1) ====================
+        function submitLeaveRequest(type) {
+            const sD = document.getElementById('startDay').value;
+            const sM = document.getElementById('startMonth').value;
+            const sY = document.getElementById('startYear').value;
+
+            const eD = document.getElementById('endDay').value;
+            const eM = document.getElementById('endMonth').value;
+            const eY = document.getElementById('endYear').value;
+
+            const start = `${sY}-${sM}-${sD}`;
+            const end = `${eY}-${eM}-${eD}`;
+
+            const leaveType = document.getElementById('leaveType').value;
+            const reason = document.getElementById('leaveReason').value;
+            const handover = document.getElementById('handoverEmp').value;
+
+            const days = parseFloat(document.getElementById('calculatedDays').textContent);
+
+            if (days <= 0 || isNaN(days)) {
+                showToast('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!', 'error');
+                return;
+            }
+
+            const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+            let status = (type === 'draft') ? 'Draft' : 'Pending Manager Approval';
+            let step = (type === 'draft') ? 'Bản nháp chưa gửi' : 'Chờ Trưởng phòng duyệt';
+            let approverHistory = (type === 'draft') ? 'Bản nháp chưa gửi' : 'Đã gửi tới Trưởng phòng (Trần Trưởng Phòng)';
+
+            if (editingDraftId) {
+                // UPDATE EXISTING DRAFT
+                const draftItem = leaveDatabase.find(x => x.id === editingDraftId);
+                if (draftItem) {
+                    draftItem.type = leaveType;
+                    draftItem.startDate = start;
+                    draftItem.endDate = end;
+                    draftItem.days = days;
+                    draftItem.reason = reason;
+                    draftItem.handover = handover;
+                    draftItem.status = status;
+                    draftItem.step = step;
+                    draftItem.approverHistory = approverHistory;
+                    draftItem.createdDate = now;
+
+                    lastCreatedLeaveId = editingDraftId;
+
+                    auditLogs.unshift({
+                        time: now + ":00",
+                        actor: "Nguyễn Văn An (Employee)",
+                        action: (type === 'draft') ? "UPDATE_DRAFT" : "SUBMIT_FROM_DRAFT",
+                        record: editingDraftId,
+                        detail: `Cập nhật & ${type === 'draft' ? 'Lưu lại bản nháp' : 'Nộp chính thức'} ${editingDraftId}`
+                    });
+
+                    showToast(type === 'draft' ? 
+                        `Đã cập nhật bản nháp [${editingDraftId}]!` : 
+                        `Đã nộp thành công đơn [${editingDraftId}] từ bản nháp! Đã chuyển sang Trưởng phòng duyệt.`, 'success');
+
+                    editingDraftId = null; // Reset
+                    sortAndRender();
+                    updateStats();
+                    showView('my-leaves');
+                    return;
+                }
+            }
+
+            // CREATE NEW RECORD
+            const newId = "LR-2026-" + String(leaveDatabase.length + 1).padStart(3, '0');
+
+            const newRecord = {
+                id: newId,
+                empId: "EMP-001",
+                empName: "Nguyễn Văn An",
+                dept: "Kỹ thuật IT",
+                type: leaveType,
+                startDate: start,
+                endDate: end,
+                days: days,
+                reason: reason,
+                handover: handover,
+                status: status,
+                step: step,
+                approverHistory: approverHistory,
+                createdDate: now,
+                hasAttachment: !!document.getElementById('fileUpload')?.files?.length
+            };
+
+            // ĐẨY LÊN ĐẦU MẢNG ĐỂ LUÔN MỚI NHẤT
+            leaveDatabase.unshift(newRecord);
+            lastCreatedLeaveId = newId;
+
+            // Add Audit log
+            auditLogs.unshift({
+                time: now + ":00",
+                actor: "Nguyễn Văn An (Employee)",
+                action: (type === 'draft') ? "SAVE_DRAFT" : "SUBMIT_LEAVE",
+                record: newId,
+                detail: `Nộp đơn ${leaveType}, thời gian ${days} ngày. Luồng: ${days > 3 ? '2 cấp (Manager+HR)' : '1 cấp (Manager)'}`
+            });
+
+            showToast(type === 'draft' ? 
+                `Đã lưu bản nháp [${newId}] thành công!` : 
+                `Tạo đơn [${newId}] thành công! Đã gửi sang danh sách duyệt của Trưởng phòng & HR.`, 'success');
+
+            sortAndRender();
+            updateStats();
+            showView('my-leaves');
+        }
+
+        // ==================== CANCEL LEAVE (UC 3) ====================
+        function cancelLeave(leaveId) {
+            const item = leaveDatabase.find(x => x.id === leaveId);
+            if (!item) return;
+
+            if (confirm(`Bạn có chắc chắn muốn HỦY đơn nghỉ phép [${leaveId}] không? Số ngày phép đã tạm giữ sẽ được hoàn trả lại ngay lập tức.`)) {
+                item.status = 'Cancelled';
+                item.step = 'Đã hủy đơn (Đã hoàn phép)';
+                item.approverHistory = 'Đơn đã hủy bởi Nhân viên $\rightarrow$ Đã hoàn trả quỹ phép';
+
+                const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+                auditLogs.unshift({
+                    time: now + ":00",
+                    actor: "Nguyễn Văn An (Employee)",
+                    action: "CANCEL_LEAVE",
+                    record: leaveId,
+                    detail: `Nhân viên yêu cầu hủy đơn, hoàn trả ${item.days} ngày phép vào quỹ`
+                });
+
+                showToast(`Đã hủy đơn ${leaveId} thành công! Đã hoàn trả ${item.days} ngày phép.`, 'success');
+                sortAndRender();
+                updateStats();
+            }
+        }
+
+        // Helper for Approvals Tab filter
+        let currentApprovalTab = 'ALL';
+        function setApprovalTab(tab) {
+            currentApprovalTab = tab;
+            const filterEl = document.getElementById('approvalStatusFilter');
+            if (filterEl) filterEl.value = tab;
+
+            ['pillAll', 'pillPending', 'pillApproved', 'pillRejected'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.className = 'btn btn-secondary';
+                }
+            });
+
+            if (tab === 'ALL') {
+                const p = document.getElementById('pillAll');
+                if (p) p.className = 'btn btn-primary';
+            } else if (tab === 'Pending') {
+                const p = document.getElementById('pillPending');
+                if (p) p.className = 'btn btn-primary';
+            } else if (tab === 'Approved') {
+                const p = document.getElementById('pillApproved');
+                if (p) p.className = 'btn btn-primary';
+            } else if (tab === 'Rejected') {
+                const p = document.getElementById('pillRejected');
+                if (p) p.className = 'btn btn-primary';
+            }
+
+            sortAndRender();
+        }
+
+        // Global alias for compatibility
+        function renderTables() {
+            sortAndRender();
+        }
+
+        // ==================== APPROVAL MODAL (UC 2) ====================
+        function openApprovalModal(leaveId) {
+            currentSelectedLeaveId = leaveId;
+            const item = leaveDatabase.find(x => x.id === leaveId);
+            if (!item) return;
+
+            document.getElementById('modalTitle').textContent = `Chi Tiết Đơn: ${item.id} - ${item.empName}`;
+            
+            let statusBadge = getStatusBadge(item.status);
+
+            document.getElementById('modalContent').innerHTML = `
+                <div style="background: rgba(11, 15, 25, 0.6); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div><b>Nhân viên nộp:</b> ${item.empName} (${item.empId}) - Phòng ${item.dept}</div>
+                    <div><b>Loại nghỉ:</b> ${item.type}</div>
+                    <div><b>Thời gian:</b> Từ ${item.startDate} đến ${item.endDate} (<b>${item.days} ngày</b>)</div>
+                    <div><b>Người nhận bàn giao:</b> ${item.handover}</div>
+                    <div><b>Lý do:</b> <i>"${item.reason}"</i></div>
+                    <div><b>Trạng thái hiện tại:</b> ${statusBadge}</div>
+                    <div><b>Lịch sử luồng duyệt:</b> <span style="color: ${item.status === 'Approved' ? 'var(--success)' : 'var(--primary)'}; font-weight: 600;">${item.approverHistory}</span></div>
+                    ${item.hasAttachment ? `<div style="color: var(--success); font-weight: 600;">📎 Có đính kèm giấy chứng nhận y tế hợp lệ</div>` : ''}
+                </div>
+            `;
+
+            const commentGroup = document.getElementById('approverComment').parentElement;
+            const btnReject = document.querySelector('#approvalModal .btn-danger');
+            const btnApprove = document.querySelector('#approvalModal .btn-success');
+
+            if (item.status === 'Approved' || item.status === 'Rejected' || item.status === 'Cancelled') {
+                // Read-only view
+                commentGroup.style.display = 'none';
+                if (btnReject) btnReject.style.display = 'none';
+                if (btnApprove) btnApprove.style.display = 'none';
+            } else {
+                commentGroup.style.display = 'flex';
+                if (btnReject) btnReject.style.display = 'inline-flex';
+                if (btnApprove) btnApprove.style.display = 'inline-flex';
+                document.getElementById('approverComment').value = '';
+            }
+
+            document.getElementById('approvalModal').style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('approvalModal').style.display = 'none';
+        }
+
+        function executeApproval(action) {
+            const item = leaveDatabase.find(x => x.id === currentSelectedLeaveId);
+            if (!item) return;
+
+            const comment = document.getElementById('approverComment').value;
+            const now = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+            if (action === 'reject') {
+                if (!comment.trim()) {
+                    alert('Bắt buộc phải nhập Lý do từ chối để nhân viên nắm được thông tin!');
+                    return;
+                }
+                item.status = 'Rejected';
+                item.step = `Bị từ chối bởi ${currentRole === 'manager' ? 'Trưởng phòng' : 'HR Admin'}`;
+                item.approverHistory = `Từ chối bởi ${currentRole === 'manager' ? 'Trưởng phòng Trần Văn Bình' : 'HR Lê Thị C'} (Lý do: "${comment}")`;
+
+                auditLogs.unshift({
+                    time: now + ":00",
+                    actor: currentRole === 'manager' ? "Trần Trưởng Phòng (Manager)" : "Lê HR Admin (HR Core)",
+                    action: "REJECT_LEAVE",
+                    record: item.id,
+                    detail: `Từ chối đơn. Lý do: "${comment}". Hoàn lại ${item.days} ngày phép`
+                });
+
+                showToast(`Đã từ chối đơn ${item.id}. Đã hoàn trả lại ngày phép cho nhân viên.`, 'error');
+            } else {
+                // APPROVE
+                if (item.days > 3 && item.status === 'Pending Manager Approval') {
+                    // Manager approve step 1 for > 3 days
+                    item.status = 'Pending HR Approval';
+                    item.step = 'Trưởng phòng ĐÃ DUYỆT → Chờ HR duyệt';
+                    item.approverHistory = `Trưởng phòng Trần Văn Bình ĐÃ DUYỆT (Bước 1) → Đang chờ HR Lê Thị C duyệt bước 2`;
+
+                    auditLogs.unshift({
+                        time: now + ":00",
+                        actor: "Trần Trưởng Phòng (Manager)",
+                        action: "APPROVE_STEP1",
+                        record: item.id,
+                        detail: `Duyệt cấp 1 đơn ${item.days} ngày (>3 ngày). Tự động chuyển tiếp HR.`
+                    });
+
+                    showToast(`Trưởng phòng đã duyệt bước 1 đơn ${item.id}! Đơn đã chuyển sang phòng HR duyệt bước cuối.`, 'success');
+                } else {
+                    // Final Approval
+                    item.status = 'Approved';
+                    item.step = 'Phê duyệt hoàn tất (Đã trừ quỹ phép)';
+                    item.approverHistory = `${currentRole === 'manager' ? 'Trưởng phòng' : 'HR Admin'} ĐÃ DUYỆT HOÀN TẤT → Đã trừ ${item.days} ngày phép`;
+
+                    auditLogs.unshift({
+                        time: now + ":00",
+                        actor: currentRole === 'manager' ? "Trần Trưởng Phòng (Manager)" : "Lê HR Admin (HR Core)",
+                        action: "APPROVE_FINAL",
+                        record: item.id,
+                        detail: `Phê duyệt hoàn tất, chính thức trừ ${item.days} ngày phép & đồng bộ lịch`
+                    });
+
+                    showToast(`Đã phê duyệt thành công đơn ${item.id}! Trạng thái chuyển sang "ĐÃ PHÊ DUYỆT" màu xanh lá.`, 'success');
+                }
+            }
+
+            closeModal();
+            sortAndRender();
+            updateStats();
+        }
+
+        // ==================== RENDER & SORT TABLES ====================
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'Pending Manager Approval':
+                    return `<span class="badge badge-pending"><i data-lucide="clock" style="width: 12px;"></i> Chờ Quản lý duyệt</span>`;
+                case 'Pending HR Approval':
+                    return `<span class="badge badge-hr"><i data-lucide="shield-alert" style="width: 12px;"></i> Chờ HR duyệt (Bước 2)</span>`;
+                case 'Approved':
+                    return `<span class="badge badge-approved"><i data-lucide="check-circle-2" style="width: 12px;"></i> Đã Phê Duyệt</span>`;
+                case 'Rejected':
+                    return `<span class="badge badge-rejected"><i data-lucide="x-circle" style="width: 12px;"></i> Đã Từ Chối</span>`;
+                case 'Draft':
+                    return `<span class="badge badge-draft"><i data-lucide="file" style="width: 12px;"></i> Bản nháp</span>`;
+                case 'Cancelled':
+                    return `<span class="badge badge-cancelled"><i data-lucide="ban" style="width: 12px;"></i> Đã Hủy Đơn</span>`;
+                default:
+                    return `<span class="badge badge-draft">${status}</span>`;
+            }
+        }
+
+        function sortAndRender() {
+            // Sắp xếp Database luôn mới nhất lên đầu
+            const sortedList = getSortedDatabase();
+
+            // 1. Dashboard Recent Table
+            const recentBody = document.getElementById('recentLeaveTableBody');
+            const myRecentList = sortedList.filter(x => x.empId === "EMP-001").slice(0, 4);
+            recentBody.innerHTML = myRecentList.map(item => `
+                <tr class="${item.id === lastCreatedLeaveId ? 'row-highlight' : ''}">
+                    <td><b>${item.id}</b></td>
+                    <td><b>${item.empName}</b><br><span style="font-size:0.72rem; color:var(--text-muted);">${item.dept}</span></td>
+                    <td>${item.type}</td>
+                    <td>${item.startDate} → ${item.endDate}</td>
+                    <td><b>${item.days} ngày</b></td>
+                    <td><span style="font-size: 0.8rem; color: var(--text-secondary);">${item.approverHistory}</span></td>
+                    <td>${getStatusBadge(item.status)}</td>
+                    <td>
+                        ${item.status === 'Draft' ? 
+                            `<button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="editDraft('${item.id}')"><i data-lucide="edit-3" style="width: 12px;"></i> Sửa & Gửi</button>` :
+                        item.status === 'Approved' || item.status.includes('Pending') ? 
+                            `<button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="cancelLeave('${item.id}')">Hủy đơn</button>` : 
+                            `<span style="color: var(--text-muted); font-size: 0.75rem;">—</span>`}
+                    </td>
+                </tr>
+            `).join('');
+
+            // 2. My Leaves History Table (Filter & Search)
+            const mySearch = document.getElementById('myLeaveSearch')?.value.toLowerCase() || '';
+            const myFilter = document.getElementById('myLeaveStatusFilter')?.value || 'ALL';
+
+            const filteredMyLeaves = sortedList.filter(x => {
+                if (currentRole === 'employee' && x.empId !== "EMP-001") return false;
+                if (myFilter !== 'ALL' && !x.status.toLowerCase().includes(myFilter.toLowerCase())) return false;
+                if (mySearch && !x.id.toLowerCase().includes(mySearch) && !x.reason.toLowerCase().includes(mySearch) && !x.empName.toLowerCase().includes(mySearch)) return false;
+                return true;
+            });
+
+            const myLeavesBody = document.getElementById('myLeavesTableBody');
+            myLeavesBody.innerHTML = filteredMyLeaves.map(item => `
+                <tr class="${item.id === lastCreatedLeaveId ? 'row-highlight' : ''}">
+                    <td><b>${item.id}</b></td>
+                    <td><b>${item.empName}</b><br><span style="font-size:0.72rem; color:var(--text-muted);">${item.dept}</span></td>
+                    <td>${item.type}</td>
+                    <td>${item.startDate} → ${item.endDate}</td>
+                    <td><b>${item.days} ngày</b></td>
+                    <td><span style="font-size: 0.8rem; color: var(--text-secondary);">${item.reason}</span></td>
+                    <td><span style="font-size: 0.8rem; color: ${item.status === 'Approved' ? 'var(--success)' : 'var(--text-secondary)'}; font-weight: 600;">${item.approverHistory}</span></td>
+                    <td>${getStatusBadge(item.status)}</td>
+                    <td>
+                        ${item.status === 'Draft' ? 
+                            `<div style="display: flex; gap: 4px;">
+                                <button class="btn btn-primary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="editDraft('${item.id}')"><i data-lucide="edit-3" style="width: 12px;"></i> Sửa & Nộp</button>
+                                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem;" onclick="cancelLeave('${item.id}')"><i data-lucide="trash-2" style="width: 12px;"></i></button>
+                            </div>` :
+                        item.status.includes('Pending') || item.status === 'Approved' ? 
+                            `<button class="btn btn-danger" style="padding: 4px 10px; font-size: 0.75rem;" onclick="cancelLeave('${item.id}')">Yêu cầu Hủy</button>` : 
+                            `<span style="color: var(--text-muted); font-size: 0.75rem;">Đã đóng</span>`}
+                    </td>
+                </tr>
+            `).join('');
+
+            // 3. Approvals List Table (Role-based, Status Tabs & Search)
+            const appSearch = document.getElementById('approvalSearch')?.value.toLowerCase() || '';
+            const appFilter = document.getElementById('approvalStatusFilter')?.value || 'ALL';
+
+            // Counts across database for current role
+            let pCount = 0;
+            let aCount = 0;
+            let rCount = 0;
+
+            sortedList.forEach(x => {
+                if (x.status === 'Draft') return;
+                if (x.status.includes('Pending')) pCount++;
+                if (x.status === 'Approved') aCount++;
+                if (x.status === 'Rejected') rCount++;
+            });
+
+            document.getElementById('pendingCount').textContent = pCount;
+            if (document.getElementById('pillPendingCount')) document.getElementById('pillPendingCount').textContent = pCount;
+            if (document.getElementById('pillApprovedCount')) document.getElementById('pillApprovedCount').textContent = aCount;
+            if (document.getElementById('pillRejectedCount')) document.getElementById('pillRejectedCount').textContent = rCount;
+
+            const approvalDisplayList = sortedList.filter(x => {
+                if (x.status === 'Draft') return false;
+
+                // Status tab filter
+                if (appFilter === 'Pending' && !x.status.includes('Pending')) return false;
+                if (appFilter === 'Approved' && x.status !== 'Approved') return false;
+                if (appFilter === 'Rejected' && x.status !== 'Rejected') return false;
+
+                if (appSearch && !x.empName.toLowerCase().includes(appSearch) && !x.id.toLowerCase().includes(appSearch)) return false;
+                return true;
+            });
+
+            const approvalsBody = document.getElementById('approvalsTableBody');
+            if (approvalDisplayList.length === 0) {
+                approvalsBody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">Không tìm thấy đơn nào theo bộ lọc đã chọn 🎉</td></tr>`;
+            } else {
+                approvalsBody.innerHTML = approvalDisplayList.map(item => `
+                    <tr class="${item.id === lastCreatedLeaveId ? 'row-highlight' : ''}">
+                        <td><b>${item.id}</b></td>
+                        <td><b>${item.empName}</b></td>
+                        <td>${item.dept}</td>
+                        <td>${item.type}</td>
+                        <td>${item.startDate} → ${item.endDate}</td>
+                        <td><b style="color: ${item.days > 3 ? 'var(--purple)' : 'var(--primary)'}">${item.days} ngày</b></td>
+                        <td><span style="font-size: 0.8rem; color: ${item.status === 'Approved' ? 'var(--success)' : 'var(--text-secondary)'}; font-weight: 500;">${item.step}</span></td>
+                        <td>${getStatusBadge(item.status)}</td>
+                        <td>
+                            ${item.status.includes('Pending') ? `
+                                <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.78rem;" onclick="openApprovalModal('${item.id}')">
+                                    <i data-lucide="check-square" style="width: 14px;"></i> Xem & Duyệt
+                                </button>
+                            ` : `
+                                <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.78rem;" onclick="openApprovalModal('${item.id}')">
+                                    <i data-lucide="eye" style="width: 14px;"></i> Xem Chi Tiết
+                                </button>
+                            `}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // 4. Audit Table
+            const auditBody = document.getElementById('auditTableBody');
+            auditBody.innerHTML = auditLogs.map(log => `
+                <tr>
+                    <td style="color: var(--text-muted); font-family: monospace; font-size: 0.8rem;">${log.time}</td>
+                    <td><b>${log.actor}</b></td>
+                    <td><span class="badge badge-draft">${log.action}</span></td>
+                    <td><b style="color: var(--primary);">${log.record}</b></td>
+                    <td style="font-size: 0.82rem; color: var(--text-secondary);">${log.detail}</td>
+                </tr>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function updateStats() {
+            const card1 = document.querySelector('.stats-grid .stat-card:nth-child(1)');
+            const card2 = document.querySelector('.stats-grid .stat-card:nth-child(2)');
+            const card3 = document.querySelector('.stats-grid .stat-card:nth-child(3)');
+            const card4 = document.querySelector('.stats-grid .stat-card:nth-child(4)');
+
+            if (!card1 || !card2 || !card3 || !card4) return;
+
+            if (currentRole === 'employee') {
+                // 1. NHÂN VIÊN: Thống kê Quỹ phép cá nhân của Nguyễn Văn An
+                let used = 0;
+                let pending = 0;
+
+                leaveDatabase.forEach(item => {
+                    if (item.empId === "EMP-001") {
+                        if (item.status === 'Approved') used += item.days;
+                        if (item.status.includes('Pending')) pending += item.days;
+                    }
+                });
+
+                let total = 12.0;
+                let available = total - used - pending;
+                if (available < 0) available = 0;
+
+                card1.querySelector('.stat-header span').textContent = 'QUỸ PHÉP NĂM';
+                card1.querySelector('.stat-value').innerHTML = `${total} <span style="font-size: 1rem; color: var(--text-muted);">ngày</span>`;
+                card1.querySelector('.stat-sub').textContent = 'Thâm niên 2 năm (+0 ngày)';
+
+                card2.querySelector('.stat-header span').textContent = 'ĐÃ SỬ DỤNG';
+                card2.querySelector('.stat-value').innerHTML = `${used.toFixed(1)} <span style="font-size: 1rem; color: var(--text-muted);">ngày</span>`;
+                card2.querySelector('.stat-sub').textContent = 'Đã được phê duyệt chính thức';
+
+                card3.querySelector('.stat-header span').textContent = 'ĐANG CHỜ DUYỆT';
+                card3.querySelector('.stat-value').innerHTML = `${pending.toFixed(1)} <span style="font-size: 1rem; color: var(--text-muted);">ngày</span>`;
+                card3.querySelector('.stat-sub').textContent = 'Tạm giữ chờ Sếp/HR duyệt';
+
+                card4.querySelector('.stat-header span').textContent = 'QUỸ PHÉP CÒN LẠI';
+                card4.querySelector('.stat-value').innerHTML = `${available.toFixed(1)} <span style="font-size: 1rem; color: var(--text-muted);">ngày</span>`;
+                card4.querySelector('.stat-sub').textContent = 'Có thể quy đổi tiền cuối năm';
+            } 
+            else if (currentRole === 'manager') {
+                // 2. TRƯỞNG PHÒNG: Thống kê Phòng Ban (Department Metrics)
+                let deptPendingCount = leaveDatabase.filter(x => x.status === 'Pending Manager Approval').length;
+                let deptTotalApprovedDays = 0;
+                leaveDatabase.filter(x => x.dept === "Kỹ thuật IT" && x.status === 'Approved').forEach(x => deptTotalApprovedDays += x.days);
+
+                card1.querySelector('.stat-header span').textContent = 'QUÂN SỐ PHÒNG BAN';
+                card1.querySelector('.stat-value').innerHTML = `8 <span style="font-size: 1rem; color: var(--text-muted);">nhân sự</span>`;
+                card1.querySelector('.stat-sub').textContent = 'Phòng Kỹ thuật IT (Trực thuộc)';
+
+                card2.querySelector('.stat-header span').textContent = 'ĐƠN CHỜ SẾP DUYỆT';
+                card2.querySelector('.stat-value').innerHTML = `<span style="color: var(--warning);">${deptPendingCount}</span> <span style="font-size: 1rem; color: var(--text-muted);">đơn</span>`;
+                card2.querySelector('.stat-sub').textContent = 'Cần xử lý trong 24h làm việc';
+
+                card3.querySelector('.stat-header span').textContent = 'ĐANG NGHỈ HÔM NAY';
+                card3.querySelector('.stat-value').innerHTML = `1 <span style="font-size: 1rem; color: var(--text-muted);">người</span>`;
+                card3.querySelector('.stat-sub').textContent = 'Định mức an toàn: ≤ 5 người/ngày';
+
+                card4.querySelector('.stat-header span').textContent = 'TỔNG NGÀY NGHỈ PHÒNG';
+                card4.querySelector('.stat-value').innerHTML = `${deptTotalApprovedDays.toFixed(1)} <span style="font-size: 1rem; color: var(--text-muted);">ngày</span>`;
+                card4.querySelector('.stat-sub').textContent = 'Tổng ngày nghỉ phòng IT trong năm';
+            } 
+            else if (currentRole === 'hr') {
+                // 3. HR ADMIN: Thống kê Toàn Công Ty & Đối Soát Lương (Company-Wide Metrics)
+                let hrPendingCount = leaveDatabase.filter(x => x.status === 'Pending HR Approval').length;
+                let allApprovedDays = 0;
+                leaveDatabase.filter(x => x.status === 'Approved').forEach(x => allApprovedDays += x.days);
+
+                card1.querySelector('.stat-header span').textContent = 'TỔNG QUY MÔ NHÂN SỰ';
+                card1.querySelector('.stat-value').innerHTML = `120 <span style="font-size: 1rem; color: var(--text-muted);">nhân viên</span>`;
+                card1.querySelector('.stat-sub').textContent = 'Toàn bộ 6 phòng ban công ty';
+
+                card2.querySelector('.stat-header span').textContent = 'ĐƠN TRÌNH HR DUYỆT (>3D)';
+                card2.querySelector('.stat-value').innerHTML = `<span style="color: var(--purple);">${hrPendingCount}</span> <span style="font-size: 1rem; color: var(--text-muted);">đơn</span>`;
+                card2.querySelector('.stat-sub').textContent = 'Đơn nghỉ dài ngày cần HR duyệt bước 2';
+
+                card3.querySelector('.stat-header span').textContent = 'TỔNG PHÉP ĐÃ CHỐT';
+                card3.querySelector('.stat-value').innerHTML = `${allApprovedDays.toFixed(1)} <span style="font-size: 1rem; color: var(--text-muted);">ngày</span>`;
+                card3.querySelector('.stat-sub').textContent = 'Đã đẩy dữ liệu sang Payroll tính lương';
+
+                card4.querySelector('.stat-header span').textContent = 'DỰ KIẾN QUY ĐỔI TIỀN';
+                card4.querySelector('.stat-value').innerHTML = `18.5 <span style="font-size: 1rem; color: var(--text-muted);">triệu</span>`;
+                card4.querySelector('.stat-sub').textContent = 'Chốt quỹ phép thừa cuối năm (31/12)';
+            }
+        }
+
+        // ==================== TOAST HELPER ====================
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toastBox');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toast.className = `toast ${type}`;
+            toastMsg.textContent = msg;
+
+            if (type === 'success') toastIcon.setAttribute('data-lucide', 'check-circle-2');
+            else if (type === 'error') toastIcon.setAttribute('data-lucide', 'alert-circle');
+            else toastIcon.setAttribute('data-lucide', 'info');
+
+            lucide.createIcons();
+
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

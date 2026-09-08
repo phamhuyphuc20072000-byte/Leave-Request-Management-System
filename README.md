@@ -26,18 +26,5 @@ Hệ thống **Quản lý Đơn xin Nghỉ phép Tự động** được thiết
 
 ---
 
-##  3. Business Process Modeling (UML Diagrams)
 
-### 🔹 Approval Flow Logic (Ma trận phê duyệt)
-```mermaid
-graph TD
-    A[Nhân viên tạo đơn xin nghỉ] --> B[Trưởng phòng xét duyệt bước 1]
-    B -->|Từ chối| R1[Hệ thống cập nhật REJECTED<br>Hoàn lại số dư phép]
-    B -->|Đồng ý| C{Hệ thống kiểm tra:<br>Số ngày nghỉ > 3 ngày?}
-    
-    C -->|Không: Đơn ≤ 3 ngày| AP[Hệ thống cập nhật APPROVED<br>Trừ quỹ phép & Đồng bộ lịch]
-    C -->|Có: Đơn > 3 ngày| D[HR / Admin xét duyệt bước 2]
-    
-    D -->|Đồng ý| AP
-    D -->|Từ chối| R1
 
